@@ -102,16 +102,18 @@ export class BetterLogger extends ConsoleLogger {
     const contextMessage = message.context ? `[${message.context}] ` : '';
     const formattedLogLevel = logLevel.toUpperCase().padStart(7, ' ');
 
-    const stringMessage = [
-      message.message,
-      message.args && message.args.length > 0
-        ? message.args.map(this.safeStringify)
-        : '',
-    ]
-      .flat()
-      .filter(Boolean)
-      .map((s) => s.trim())
-      .join(' ');
+    const stringMessage = String(
+      [
+        message.message || '',
+        message.args && message.args.length > 0
+          ? message.args.map(this.safeStringify)
+          : '',
+      ]
+        .flat()
+        .map((s) => String(s).trim())
+        .filter(Boolean)
+        .join(' '),
+    ).trim();
 
     return this.formatMessage(
       logLevel,

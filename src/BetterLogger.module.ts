@@ -5,7 +5,7 @@ import {
   NestModule,
 } from '@nestjs/common/interfaces';
 import { BetterLogger } from './BetterLogger';
-import { BetterLoggerConfig } from './model';
+import { BetterLoggerConfig, PARAMS_PROVIDER_TOKEN } from './model';
 import { RequestLoggerMiddleware } from './RequestLoggerMiddleware';
 
 @Module({})
@@ -15,7 +15,7 @@ export class BetterLoggerModule implements NestModule {
       module: BetterLoggerModule,
       providers: [
         {
-          provide: 'CONFIG_OPTIONS',
+          provide: PARAMS_PROVIDER_TOKEN,
           useValue: options,
         },
         BetterLogger,
