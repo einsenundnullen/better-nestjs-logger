@@ -11,7 +11,8 @@
     "build": "tsc -p tsconfig.build.json",
     "example": "rimraf dist && tsc && LOG_LEVEL=debug node dist/example/main",
     "prepublishOnly": "npm run build && cp -r ./dist/* .",
-    "postpublish": "git clean -fd"
+    "postpublish": "git clean -fd",
+    "publish:npm": "npm run build && npm publish --access public"
   },
   "files": [
     "*.{js,d.ts}"

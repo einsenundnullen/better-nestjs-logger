@@ -18,7 +18,7 @@ export class BetterLoggerModule implements NestModule {
           provide: 'CONFIG_OPTIONS',
           useValue: options,
         },
-        BetterLoggerModule,
+        BetterLogger,
       ],
       exports: [BetterLogger],
     };
