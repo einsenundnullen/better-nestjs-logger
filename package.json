@@ -1,6 +1,6 @@
 {
   "name": "@einsenundnullen/better-nestjs-logger",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Better logger for NestJS, with json and no hassle",
   "main": "index.js",
   "types": "index.d.ts",
