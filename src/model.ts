@@ -1,0 +1,15 @@
+export const PARAMS_PROVIDER_TOKEN = 'better-logger-config';
+
+export type PreparedMessageArgs = {
+  message: string;
+  context: string;
+  args: any[];
+};
+
+export type PreparedMetaInfo = {
+  pid: string;
+};
+
+export type BetterLoggerConfig = {
+  json?: boolean;
+};
