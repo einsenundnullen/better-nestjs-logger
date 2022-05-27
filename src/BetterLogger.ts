@@ -62,6 +62,7 @@ export class BetterLogger extends ConsoleLogger {
   private prepareMetaInfo(): PreparedMetaInfo {
     return {
       pid: String(process.pid),
+      timestamp: new Date().toUTCString(),
     };
   }
 
@@ -71,11 +72,12 @@ export class BetterLogger extends ConsoleLogger {
     metaInfo: PreparedMetaInfo,
   ) {
     return `${JSON.stringify({
-      level: logLevel,
-      msg: message.message,
-      args: message.args,
+      severity: logLevel,
+      message: message.message,
+      payload: message.args,
       context: message.context,
       pid: metaInfo.pid,
+      timestamp: metaInfo.timestamp,
     })}\n`;
   }
 

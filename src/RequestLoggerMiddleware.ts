@@ -6,18 +6,20 @@ export class RequestLoggerMiddleware implements NestMiddleware {
   private logger = new Logger('Http');
 
   use(request: Request, response: Response, next: NextFunction): void {
-    const { ip, method, path: url } = request;
+    const { ip, method, originalUrl } = request;
     const userAgent = request.get('user-agent') || '';
 
     response.on('close', () => {
       const { statusCode } = response;
 
-      const message = [method, url, '=>', statusCode].filter(Boolean).join(' ');
+      const message = [method, originalUrl, '=>', statusCode]
+        .filter(Boolean)
+        .join(' ');
       const metaData = {
-        ip,
-        url,
-        statusCode,
-        method,
+        remoteIp: ip,
+        requestUrl: originalUrl,
+        status: statusCode,
+        requestMethod: method,
         userAgent,
       };
 

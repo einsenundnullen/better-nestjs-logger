@@ -8,6 +8,7 @@ export type PreparedMessageArgs = {
 
 export type PreparedMetaInfo = {
   pid: string;
+  timestamp: string;
 };
 
 export type BetterLoggerConfig = {
