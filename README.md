@@ -44,7 +44,9 @@ import { Module } from '@nestjs/common';
       logLevel: ['log', 'debug', 'error', 'verbose', 'warn'],
       // Set options for the request middleware
       requestMiddleware: {
+        // enable header logging (off by default)
         headers: true,
+        // set headers that should be redacted
         redactedHeaders: ['authorization', 'cookie'],
       },
     }),
