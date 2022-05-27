@@ -9,43 +9,62 @@ import {
 
 export class BetterLogger extends ConsoleLogger {
   private readonly outputAsJson;
+  private readonly logLevels: LogLevel[];
 
   constructor(@Inject(PARAMS_PROVIDER_TOKEN) options?: BetterLoggerConfig) {
     super();
     this.outputAsJson = options?.json;
+    this.logLevels = options?.logLevel || [
+      'log',
+      'error',
+      'warn',
+      'debug',
+      'verbose',
+    ];
   }
 
   error(...args: any[]) {
+    if (!this.isLogLevelEnabled('error')) {
+      return;
+    }
     const finalArgs = this.prepareArgs(args);
     super.error(finalArgs);
   }
 
   warn(...args: any[]) {
+    if (!this.isLogLevelEnabled('warn')) {
+      return;
+    }
     const finalArgs = this.prepareArgs(args);
     super.warn(finalArgs);
   }
 
   log(...args: any[]) {
+    if (!this.isLogLevelEnabled('log')) {
+      return;
+    }
     const finalArgs = this.prepareArgs(args);
     super.log(finalArgs);
   }
 
   debug(...args: any[]) {
+    if (!this.isLogLevelEnabled('debug')) {
+      return;
+    }
     const finalArgs = this.prepareArgs(args);
     super.debug(finalArgs);
   }
 
   verbose(...args: any[]) {
+    if (!this.isLogLevelEnabled('verbose')) {
+      return;
+    }
     const finalArgs = this.prepareArgs(args);
     super.verbose(finalArgs);
   }
 
-  private format(args: PreparedMessageArgs) {
-    return `[${args.context}]: ${args.message} ${JSON.stringify(
-      args.args,
-      null,
-      this.outputAsJson ? 0 : 2,
-    )}`;
+  private isLogLevelEnabled(level: LogLevel) {
+    return this.logLevels.includes(level);
   }
 
   private prepareArgs(args: any[] = []): PreparedMessageArgs {

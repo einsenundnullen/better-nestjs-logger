@@ -1,3 +1,5 @@
+import { LogLevel } from '@nestjs/common';
+
 export const PARAMS_PROVIDER_TOKEN = 'better-logger-config';
 
 export type PreparedMessageArgs = {
@@ -13,4 +15,5 @@ export type PreparedMetaInfo = {
 
 export type BetterLoggerConfig = {
   json?: boolean;
+  logLevel?: LogLevel[];
 };
