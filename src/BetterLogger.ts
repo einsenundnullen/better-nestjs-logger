@@ -90,10 +90,18 @@ export class BetterLogger extends ConsoleLogger {
     message: PreparedMessageArgs,
     metaInfo: PreparedMetaInfo,
   ) {
+    const payload = message.args.reduce(
+      (accumulator, value, index) => ({
+        ...accumulator,
+        [`arg${index}`]: value,
+      }),
+      {},
+    );
+
     return `${JSON.stringify({
       severity: logLevel,
       message: message.message,
-      payload: message.args,
+      payload: payload,
       context: message.context,
       pid: metaInfo.pid,
       timestamp: metaInfo.timestamp,

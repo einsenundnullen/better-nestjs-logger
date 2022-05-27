@@ -13,7 +13,13 @@ export type PreparedMetaInfo = {
   timestamp: string;
 };
 
+export type BetterLoggerRequestMiddlewareConfig = {
+  headers?: boolean;
+  redactedHeaders?: string[];
+};
+
 export type BetterLoggerConfig = {
   json?: boolean;
   logLevel?: LogLevel[];
+  requestMiddleware?: BetterLoggerRequestMiddlewareConfig;
 };

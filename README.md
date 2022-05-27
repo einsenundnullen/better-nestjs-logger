@@ -6,7 +6,7 @@ This is just a simple logger for NestJS. It prints to console and can output pla
 
 Compared to the classic `console.log` statement it is not possible to pass additional data to the default NestJS logger instance. Better logger aims to provide a more coherent logging experience while still being able to print nice log lines for local development as well as JSON output for cloud environments.
 
-BetterLogger uses [convention over configuration](https://en.wikipedia.org/wiki/Convention_over_configuration) and therefore allows only minimal configuration compared to other logging libraries.
+BetterLogger focuses on less configuration and more convention and therefore allows only minimal configuration compared to other logging libraries.
 
 ### Features
 
@@ -40,6 +40,13 @@ import { Module } from '@nestjs/common';
     BetterLoggerModule.forRoot({
       // Enable JSON output
       json: true,
+      // Set desired log levels
+      logLevel: ['log', 'debug', 'error', 'verbose', 'warn'],
+      // Set options for the request middleware
+      requestMiddleware: {
+        headers: true,
+        redactedHeaders: ['authorization', 'cookie'],
+      },
     }),
   ],
   controllers: [],
