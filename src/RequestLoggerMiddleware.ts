@@ -3,6 +3,12 @@ import { NextFunction, Request, Response } from 'express';
 import { IncomingHttpHeaders } from 'http';
 import { getReasonPhrase } from 'http-status-codes';
 import { BetterLoggerConfig, PARAMS_PROVIDER_TOKEN } from './model';
+
+type HRTime = [number, number];
+
+const NS_PER_SEC = 1e9;
+const NS_TO_MS = 1e6;
+
 @Injectable()
 export class RequestLoggerMiddleware implements NestMiddleware {
   private readonly logger = new Logger(RequestLoggerMiddleware.name);
@@ -33,16 +39,31 @@ export class RequestLoggerMiddleware implements NestMiddleware {
     };
   }
 
+  private getDurationMs(startTime: HRTime): number {
+    const diff = process.hrtime(startTime);
+    return (diff[0] * NS_PER_SEC + diff[1]) / NS_TO_MS;
+  }
+
   use(request: Request, response: Response, next: NextFunction): void {
     const { ip, method, originalUrl, headers } = request;
     const userAgent = request.get('user-agent') || '';
+    const startTime = process.hrtime();
 
     response.on('close', () => {
       const { statusCode } = response;
 
       const reason = getReasonPhrase(statusCode);
 
-      const message = [method, originalUrl, '=>', statusCode, reason]
+      const durationMs = this.getDurationMs(startTime).toFixed(2);
+
+      const message = [
+        method,
+        originalUrl,
+        '=>',
+        statusCode,
+        reason,
+        `(${durationMs}ms)`,
+      ]
         .filter(Boolean)
         .join(' ');
 
@@ -57,6 +78,7 @@ export class RequestLoggerMiddleware implements NestMiddleware {
         requestUrl: originalUrl,
         status: statusCode,
         requestMethod: method,
+        duration: durationMs,
         userAgent,
         ...headerInfo,
       };
