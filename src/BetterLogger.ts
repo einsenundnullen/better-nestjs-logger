@@ -112,7 +112,11 @@ export class BetterLogger extends ConsoleLogger {
     if (!value) {
       return '';
     }
+
     try {
+      if (value instanceof Error) {
+        return JSON.stringify(value, Object.getOwnPropertyNames(value));
+      }
       return JSON.stringify(value);
     } catch (error) {
       try {
@@ -159,7 +163,7 @@ export class BetterLogger extends ConsoleLogger {
     // ignore this context. we got it already
     context = '',
     logLevel: LogLevel = 'log',
-    writeStreamType?: 'stdout' | 'stderr',
+    writeStreamType: 'stdout' | 'stderr' = 'stdout',
   ) {
     messages.forEach((message) => {
       const metaInfo = this.prepareMetaInfo();
@@ -167,7 +171,7 @@ export class BetterLogger extends ConsoleLogger {
         ? this.formatMessageJson(logLevel, message, metaInfo)
         : this.formatMessageString(logLevel, message, metaInfo);
 
-      process[writeStreamType ?? 'stdout'].write(formatedMessage);
+      process[writeStreamType].write(formatedMessage);
     });
   }
 }
