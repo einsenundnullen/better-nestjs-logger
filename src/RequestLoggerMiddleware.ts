@@ -14,10 +14,12 @@ export class RequestLoggerMiddleware implements NestMiddleware {
   private readonly logger = new Logger(RequestLoggerMiddleware.name);
   private readonly logHeaders: boolean;
   private readonly redactedHeaders: string[];
+  private readonly getCustomFields;
 
   constructor(@Inject(PARAMS_PROVIDER_TOKEN) config?: BetterLoggerConfig) {
-    this.logHeaders = config?.requestMiddleware?.headers || false;
-    this.redactedHeaders = config?.requestMiddleware?.redactedHeaders || [];
+    this.logHeaders = config?.requestMiddleware?.headers ?? false;
+    this.redactedHeaders = config?.requestMiddleware?.redactedHeaders ?? [];
+    this.getCustomFields = config?.getCustomFields;
   }
 
   private prepareHeaders(headers: IncomingHttpHeaders) {
@@ -44,12 +46,27 @@ export class RequestLoggerMiddleware implements NestMiddleware {
     return (diff[0] * NS_PER_SEC + diff[1]) / NS_TO_MS;
   }
 
+  private getCustomFieldData(request: Request, response: Response) {
+    try {
+      if (this.getCustomFields) {
+        const data = this.getCustomFields(request, response);
+        if (!data) {
+          return {};
+        }
+        return data;
+      }
+    } catch (error) {
+      console.error('Error getting trace context', error);
+    }
+    return {};
+  }
+
   use(request: Request, response: Response, next: NextFunction): void {
     const { ip, method, originalUrl, headers } = request;
     const userAgent = request.get('user-agent') || '';
     const startTime = process.hrtime();
 
-    response.on('close', () => {
+    response.on('close', async () => {
       const { statusCode } = response;
 
       const reason = getReasonPhrase(statusCode);
@@ -73,6 +90,8 @@ export class RequestLoggerMiddleware implements NestMiddleware {
           }
         : {};
 
+      const customFieldData = this.getCustomFieldData(request, response);
+
       const requestInfo = {
         remoteIp: ip,
         requestUrl: originalUrl,
@@ -81,6 +100,7 @@ export class RequestLoggerMiddleware implements NestMiddleware {
         duration: durationMs,
         userAgent,
         ...headerInfo,
+        ...customFieldData,
       };
 
       if (statusCode <= 399) {

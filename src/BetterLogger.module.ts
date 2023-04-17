@@ -1,15 +1,11 @@
 import { Module } from '@nestjs/common';
-import {
-  DynamicModule,
-  MiddlewareConsumer,
-  NestModule,
-} from '@nestjs/common/interfaces';
+import { DynamicModule, MiddlewareConsumer } from '@nestjs/common/interfaces';
 import { BetterLogger } from './BetterLogger';
-import { BetterLoggerConfig, PARAMS_PROVIDER_TOKEN } from './model';
 import { RequestLoggerMiddleware } from './RequestLoggerMiddleware';
+import { BetterLoggerConfig, PARAMS_PROVIDER_TOKEN } from './model';
 
 @Module({})
-export class BetterLoggerModule implements NestModule {
+export class BetterLoggerModule {
   static forRoot(options?: BetterLoggerConfig): DynamicModule {
     return {
       module: BetterLoggerModule,

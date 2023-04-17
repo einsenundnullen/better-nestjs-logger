@@ -1,6 +1,6 @@
 {
   "name": "@einsenundnullen/better-nestjs-logger",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "Better logger for NestJS, with json and no hassle",
   "main": "index.js",
   "types": "index.d.ts",
@@ -9,6 +9,7 @@
     "lint": "eslint \"{src,__tests__}/**/*.ts\" --fix",
     "prebuild": "rimraf dist",
     "build": "tsc -p tsconfig.build.json",
+    "watch": "tsc -p tsconfig.build.json --watch",
     "example": "rimraf dist && tsc && LOG_LEVEL=debug node dist/example/main",
     "prepublishOnly": "npm run build && cp -r ./dist/* .",
     "postpublish": "git clean -fd",

@@ -10,11 +10,13 @@ import {
 export class BetterLogger extends ConsoleLogger {
   private readonly outputAsJson;
   private readonly logLevels: LogLevel[];
+  private readonly getCustomFields;
 
   constructor(@Inject(PARAMS_PROVIDER_TOKEN) options?: BetterLoggerConfig) {
     super();
-    this.outputAsJson = options?.json;
-    this.logLevels = options?.logLevel || [
+    this.outputAsJson = options?.json ?? false;
+    this.getCustomFields = options?.getCustomFields;
+    this.logLevels = options?.logLevel ?? [
       'log',
       'error',
       'warn',
@@ -70,10 +72,12 @@ export class BetterLogger extends ConsoleLogger {
   private prepareArgs(args: any[] = []): PreparedMessageArgs {
     const context = args.pop();
     const message = args.shift();
+    const customFieldData = this.getCustomFieldData();
 
     return {
       message,
       context,
+      customFieldData,
       args,
     };
   }
@@ -93,7 +97,7 @@ export class BetterLogger extends ConsoleLogger {
     const payload = message.args.reduce(
       (accumulator, value, index) => ({
         ...accumulator,
-        [`arg${index}`]: value,
+        [`arg${index}`]: JSON.parse(this.safeStringify(value)),
       }),
       {},
     );
@@ -105,6 +109,7 @@ export class BetterLogger extends ConsoleLogger {
       context: message.context,
       pid: metaInfo.pid,
       timestamp: metaInfo.timestamp,
+      ...message.customFieldData,
     })}\n`;
   }
 
@@ -112,7 +117,6 @@ export class BetterLogger extends ConsoleLogger {
     if (!value) {
       return '';
     }
-
     try {
       if (value instanceof Error) {
         return JSON.stringify(value, Object.getOwnPropertyNames(value));
@@ -125,6 +129,21 @@ export class BetterLogger extends ConsoleLogger {
         return String(value);
       }
     }
+  }
+
+  private getCustomFieldData() {
+    try {
+      if (this.getCustomFields) {
+        const data = this.getCustomFields();
+        if (!data) {
+          return {};
+        }
+        return data;
+      }
+    } catch (error) {
+      console.error('Error getting trace context', error);
+    }
+    return {};
   }
 
   formatMessageString(
@@ -140,6 +159,9 @@ export class BetterLogger extends ConsoleLogger {
         message.message || '',
         message.args && message.args.length > 0
           ? message.args.map(this.safeStringify)
+          : '',
+        Object.keys(message.customFieldData).length > 0
+          ? this.safeStringify(message.customFieldData)
           : '',
       ]
         .flat()
@@ -158,7 +180,7 @@ export class BetterLogger extends ConsoleLogger {
     );
   }
 
-  protected printMessages(
+  protected async printMessages(
     messages: PreparedMessageArgs[],
     // ignore this context. we got it already
     context = '',
