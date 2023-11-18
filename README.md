@@ -48,6 +48,8 @@ import { Module } from '@nestjs/common';
         headers: true,
         // set headers that should be redacted
         redactedHeaders: ['authorization', 'cookie'],
+        // set paths that should be ignored
+        ignoredPaths: ['/health'],
       },
     }),
   ],
