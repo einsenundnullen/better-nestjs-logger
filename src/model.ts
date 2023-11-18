@@ -17,6 +17,7 @@ export type PreparedMetaInfo = {
 export type BetterLoggerRequestMiddlewareConfig = {
   headers?: boolean;
   redactedHeaders?: string[];
+  ignoredPaths?: string[];
 };
 
 export type BetterLoggerConfig = {

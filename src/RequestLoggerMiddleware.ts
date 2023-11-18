@@ -14,11 +14,13 @@ export class RequestLoggerMiddleware implements NestMiddleware {
   private readonly logger = new Logger(RequestLoggerMiddleware.name);
   private readonly logHeaders: boolean;
   private readonly redactedHeaders: string[];
+  private readonly ignoredPaths: string[];
   private readonly getCustomFields;
 
   constructor(@Inject(PARAMS_PROVIDER_TOKEN) config?: BetterLoggerConfig) {
     this.logHeaders = config?.requestMiddleware?.headers ?? false;
     this.redactedHeaders = config?.requestMiddleware?.redactedHeaders ?? [];
+    this.ignoredPaths = config?.requestMiddleware?.ignoredPaths ?? [];
     this.getCustomFields = config?.getCustomFields;
   }
 
@@ -63,6 +65,12 @@ export class RequestLoggerMiddleware implements NestMiddleware {
 
   use(request: Request, response: Response, next: NextFunction): void {
     const { ip, method, originalUrl, headers } = request;
+
+    if (this.ignoredPaths.includes(originalUrl)) {
+      next();
+      return;
+    }
+
     const userAgent = request.get('user-agent') || '';
     const startTime = process.hrtime();
 
